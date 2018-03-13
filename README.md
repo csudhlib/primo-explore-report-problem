@@ -2,6 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/primo-explore-report-problem.svg)](https://www.npmjs.com/package/primo-explore-report-problem)
 
+*Note: These instructions are not up-to-date*
+
 ## Features
 A banner with a link to report a problem/bug appears below the "send to" actions in the details view. The text of the banner is configurable, and clicking the button will redirect to an external URL and pass the parameters of the current search to that URL. This can be used to auto-fill an external "report problem" form.
 
