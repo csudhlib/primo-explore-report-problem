@@ -2,10 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/primo-explore-report-problem.svg)](https://www.npmjs.com/package/primo-explore-report-problem)
 
-*Note: These instructions are not up-to-date*
-
 ## Features
-A banner with a link to report a problem/bug appears below the "send to" actions in the details view. The text of the banner is configurable, and clicking the button will redirect to an external URL and pass the parameters of the current search to that URL. This can be used to auto-fill an external "report problem" form.
+A banner with a form to report a problem/bug appears above the "get/view it" section in the details view. The text of the banner is configurable, and clicking the button will open up a form below the banner. The form data is processed using an external php page. _see example at `src/php/report.php`_
 
 ### Screenshot
 ![screenshot](screenshot.png)
@@ -25,7 +23,7 @@ A banner with a link to report a problem/bug appears below the "send to" actions
     npm install primo-explore-report-problem
     ```
 
-alternatively, just copy `dist/module.js` into your package's `custom.js` file.
+Alternatively, just copy `dist/module.js` into your package's `custom.js` file.
 
 ## Usage
 Once this package is installed, add `reportProblem` as a dependency for your custom module definition.
@@ -34,34 +32,93 @@ Once this package is installed, add `reportProblem` as a dependency for your cus
 var app = angular.module('viewCustom', ['reportProblem'])
 ```
 
-Then, enable the customization by embedding it in the `prmActionListAfter` hook:
+Activate the customization by setting `reportProblem.enabled` to `true`
 ```js
-app.component('prmActionListAfter', {template: '<oca-report-problem />'})
+app.value('reportProblem', {
+  enabled: true
+})
 ```
 
 #### Configuration
-You can configure the banner by passing in attributes to the `oca-report-problem` element. The `report-url` property is required; the others will default to the values shown in the screenshot.
+The banner can be configured using the `reportProblem` option object.  
+Default options are provided in a 'Default' variant of the option object, as shown below. _Only override the non-default object_
 
-| name      | type         | usage                                                                                   |
-|-----------|--------------|-----------------------------------------------------------------------------------------|
-| `message-text` | string       | banner text displayed next to the button.                                               |
-| `button-text`  | string       | text displayed on the button itself.                                                    |
-| `report-url`    | string (url) | base URL for your 'report a problem' page, to which all of the search parameters will be sent |
+You can also configure the banner by passing in attributes to the `oca-report-problem` element. The `report-url` property is required.  
+The `reportProblem.enabled` property is still required to enable the module
 
-The line below would add a banner with different button and message texts.
+##### reportProblem / reportProblemDefault
+
+| name                          | type           | usage                                                                 |
+|-------------------------------|----------------|-----------------------------------------------------------------------|
+| `enabled`                     | boolean        | enables the reportProblem module                                      |
+| `enabledDefault`              | boolean        | enables the default reportProblem banner                              |
+| `reportUrl`                   | string (url)   | url to external form processor _see `src/php/report.php` for example_ |
+| `messageText`                 | string         | banner message text                                                   |
+| `buttonText`                  | string         | banner button message text                                            |
+| `reportVendor`                | string         | which vendor-specific properties to use                               |
+| `subject`                     | string         | subject of the problem report email/ticket                            |
+|                               |                |                                                                       |
+| _email-specific options_      |                |                                                                       |
+| `toEmail`                     | string (email) | email which the problem report will be sent to                        |
+|                               |                |                                                                       |
+| _libanswers-specific options_ |                |                                                                       |
+| `instid`                      | string         | institution id                                                        |
+| `quid`                        | string         | queue id                                                              |
+| `qlog`                        | string         | should be set to 0                                                    |
+| `source`                      | string         | should be set to 4                                                    |
+
+##### banner attributes
+
+| name            | type         | usage                                                                 |
+|-----------------|--------------|-----------------------------------------------------------------------|
+| `message-text`  | string       | banner message text                                                   |
+| `button-text`   | string       | banner button message text                                            |
+| `report-url`    | string (url) | url to external form processor _see `src/php/report.php` for example_ |
+| `report-vendor` | string       | which vendor-specific properties to use (email, libanswers)           |
+
+### Example
 
 ```js
-app.component('prmActionListAfter', {template: '<oca-report-problem report-url="http://my.library.edu/reportproblem.php?" message-text="Want to report a problem?" button-text="Submit report" />'})
+// uses the default banner location and sends an email upon submit
+
+var app = angular.module('viewCustom', ['reportProblem'])
+
+app.value('reportProblem', {
+  //general options
+  enabled: true,
+  reportUrl: 'http://my.library.edu/report.php?',
+  messageText: 'Would you like to report an issue with this record?',
+  buttonText: 'Submit issue',
+  reportVendor: 'email',
+  subject: 'Report A Problem Test',
+  
+  //email-specific options
+  toEmail: 'reportproblem@my.library.edu'
+})
 ```
 
-When the button is clicked, if the user was viewing a page like: `https://primo.lclark.edu/primo-explore/fulldisplay?docid=CP71139633100001451&context=L&vid=......`
+```js
+// disables the default banner and places a custom banner in the prm-action-list-after element; submits a ticket to a libanswers queue
 
-They would be sent to:
-`http://my.library.edu/reportproblem.php?docid=CP71139633100001451&context=L&vid=.....`
+var app = angular.module('viewCustom', ['reportProblem'])
 
-All of the URL parameters could then be handled by a server-side script.
+app.value('reportProblem', {
+  //general options
+  enabled: true,
+  enabledDefault: false,
+  subject: 'Report A Problem Test',
+  
+  //libanswers-specific options
+  instid: '000',
+  quid: '0000',
+  qlog: '0',
+  source: '4'
+})
 
-## Running tests
+app.component('prmActionListAfter', {template: '<oca-report-problem report-url="http://my.library.edu/reportproblem.php?" message-text="Want to report a problem?" button-text="Submit report" report-vendor="libanswers" />'})
+```
+
+<!-- ## Running tests
 1. Clone the repo
 2. Run `npm install`
-3. Run `npm test`
+3. Run `npm test` -->
