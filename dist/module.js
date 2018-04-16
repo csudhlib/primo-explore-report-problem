@@ -22,8 +22,7 @@ angular.module('reportProblem').component('ocaReportProblem', {
     this.buttonText = this.buttonText || (reportProblem.hasOwnProperty("buttonText") ? reportProblem.buttonText : reportProblemDefault.buttonText);
     this.reportUrl = this.reportUrl || (reportProblem.hasOwnProperty("reportUrl") ? reportProblem.reportUrl : reportProblemDefault.reportUrl);
     this.reportVendor = this.reportVendor || (reportProblem.hasOwnProperty("reportVendor") ? reportProblem.reportVendor : reportProblemDefault.reportVendor);
-    this.showLocations = ['/fulldisplay', // details view
-    '/openurl'];
+    this.showLocations = ['/fulldisplay', '/openurl'];
     this.$onInit = function () {
       this.targetUrl = this.reportUrl + $httpParamSerializer($location.search());
       this.show = this.showLocations.includes($location.path()) && this.enabled === true;
@@ -105,9 +104,19 @@ angular.module('reportProblem').component('ocaReportProblem', {
 }]);
 
 angular.module('reportProblem').value('reportProblem', {}).value('reportProblemDefault', {
-  enabled: true,
+  //general options
+  enabled: false,
   enabledDefault: true,
   reportUrl: 'http://my.library.edu/reportproblem.php?',
+  reportVendor: 'email',
   messageText: 'See something that doesn\'t look right?',
-  buttonText: 'Report a Problem'
+  buttonText: 'Report a Problem',
+  subject: '',
+  //email-specific options
+  toEmail: '',
+  //libanswers-specific options
+  instid: '',
+  quid: '',
+  qlog: '',
+  source: ''
 });
